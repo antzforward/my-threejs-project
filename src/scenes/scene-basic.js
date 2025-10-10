@@ -78,6 +78,14 @@ export default function setup({ scene, camera, renderer, controls }) {
         
         // 设置阴影
         renderer.shadowMap.enabled = true;
+        
+        // 添加键盘监听
+        document.addEventListener('keydown', handleKeyPress);
+        // 更新场景信息
+		const stats = document.getElementById('sceneStats');
+		if (stats) {
+			stats.innerHTML = `${sceneInfo.name}`;
+		}
     }
     
     // 更新函数 - 每帧调用
@@ -88,24 +96,27 @@ export default function setup({ scene, camera, renderer, controls }) {
         }
     }
     
-    // 键盘事件处理
-    function onKeyDown(event) {
-        const moveSpeed = 0.1;
+    function handleKeyPress(event){
+		const moveSpeed = 0.1;
         
-        switch(event.code) {
-            case 'KeyW': // 前进
+        switch(event.key) {
+            case 'W':case 'w': // 前进
                 camera.position.z -= moveSpeed;
                 break;
-            case 'KeyS': // 后退
+            case 'S':case 's': // 后退
                 camera.position.z += moveSpeed;
                 break;
-            case 'KeyA': // 左移
+            case 'A':case 'a': // 左移
                 camera.position.x -= moveSpeed;
                 break;
-            case 'KeyD': // 右移
+            case 'D':case 'd': // 右移
                 camera.position.x += moveSpeed;
                 break;
         }
+    }
+    // 键盘事件处理
+    function onKeyDown(event) {
+        handleKeyPress(event);
     }
     
     function onKeyUp(event) {
@@ -124,6 +135,7 @@ export default function setup({ scene, camera, renderer, controls }) {
         if (animationId) {
             cancelAnimationFrame(animationId);
         }
+        document.removeEventListener('keydown', handleKeyPress);
     }
     
     // 初始化场景

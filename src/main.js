@@ -48,26 +48,29 @@ class ThreeJSPlatform {
     }
     
     async loadSceneList() {
-        try {
-            // 手动导入场景文件
-            const sceneFiles = [
-                await import('./scenes/scene-basic.js'),
-                await import('./scenes/scene-geometry.js')
-            ];
-            
-            this.scenes = sceneFiles
-                .filter(module => module.sceneInfo)
-                .map(module => ({
-                    ...module.sceneInfo,
-                    load: module.default
-                }))
-                .sort((a, b) => a.order - b.order);
-            
-            this.generateSceneList();
-            
-        } catch (error) {
-            console.error('加载场景列表失败:', error);
-        }
+		try {
+			// 动态获取 scenes 目录下的所有文件
+			const scenesContext = import.meta.glob('./scenes/*.js');
+			
+			for (const path in scenesContext) {
+				const module = await scenesContext[path]();
+				if (module.sceneInfo) {
+					this.scenes.push({
+						...module.sceneInfo,
+						load: module.default // 场景的默认导出函数
+					});
+				}
+			}
+			
+			// 按顺序排序
+			this.scenes.sort((a, b) => a.order - b.order);
+			
+			// 生成左侧列表
+			this.generateSceneList();
+			
+		} catch (error) {
+			console.error('加载场景列表失败:', error);
+		}
     }
     
     generateSceneList() {
@@ -103,7 +106,7 @@ class ThreeJSPlatform {
         document.querySelectorAll('.scene-item').forEach(item => {
             item.classList.remove('active');
         });
-        event.target.classList.add('active');
+        if(typeof event !== 'undefined' && event.target)event.target.classList.add('active');
         
         // 清理当前场景
         if (this.currentSceneModule && this.currentSceneModule.destroy) {
