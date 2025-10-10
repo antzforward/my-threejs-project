@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js 学习平台</title>
+    <link rel="stylesheet" href="./src/styles/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧场景列表 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>Three.js 场景</h1>
+                <p>点击场景名称加载</p>
+            </div>
+            <div class="scene-list" id="sceneList">
+                <!-- 场景列表将由 JavaScript 动态生成 -->
+            </div>
+        </aside>
+
+        <!-- 右侧主内容区 -->
+        <main class="main-content">
+            <!-- 3D 场景展示区 -->
+            <div class="scene-container">
+                <div id="threejs-container" class="threejs-canvas"></div>
+                <div class="scene-info" id="sceneInfo">
+                    <h3 id="currentSceneName">请选择场景</h3>
+                    <div class="scene-stats" id="sceneStats"></div>
+                </div>
+            </div>
+
+            <!-- 场景描述和技术说明 -->
+            <div class="description-panel">
+                <div class="description-content" id="descriptionContent">
+                    <p>选择一个场景来查看详细说明</p>
+                    
+                    <h4>技术要点</h4>
+				    <div class="code-block-container">
+				        <div class="code-block" id="codeBlock">
+				            <!-- 代码内容将通过 JavaScript 动态设置 -->
+				        </div>
+				        <button class="copy-button" onclick="copyCode()">复制代码</button>
+				    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div id="loadingIndicator" class="loading">
+        <div class="spinner"></div>
+        <p>加载场景中...</p>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
