@@ -155,19 +155,12 @@ body {
     margin-bottom: 5px;
 }
 
-.code-block {
-    background: #1a1a2e;
-    padding: 15px;
-    border-radius: 6px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    margin: 10px 0;
-    overflow-x: auto;
-}
-
+/* 控制列表 */
 .controls-list {
     display: flex;
     gap: 15px;
+    -webkit-gap: 15px;
+    -moz-gap: 15px;
     flex-wrap: wrap;
 }
 
@@ -175,6 +168,8 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    -webkit-gap: 8px;
+    -moz-gap: 8px;
 }
 
 kbd {
@@ -186,36 +181,7 @@ kbd {
     border: 1px solid #1a1a2e;
 }
 
-/* 加载指示器 */
-.loading {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 1000;
-}
-
-.loading.active {
-    display: flex;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #0f3460;
-    border-top: 4px solid #e94560;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-}
-
-/* 代码块样式优化 */
+/* 代码块样式 - 合并重复定义 */
 .code-block {
     background: #1a1a2e;
     padding: 15px;
@@ -225,20 +191,48 @@ kbd {
     margin: 10px 0;
     overflow-x: auto;
     
-    /* 关键：保持空白和换行 */
-    white-space: pre-wrap;      /* 保留空白符，自动换行 */
-    word-wrap: break-word;      /* 长单词换行 */
-    word-break: break-all;      /* 在任意字符间断行 */
+    /* 保持空白和换行 */
+    white-space: pre-wrap;
+    word-wrap: break-word;
     
-    /* 代码高亮颜色 */
+    /* 基础文本颜色 */
     color: #e9ecef;
     line-height: 1.4;
-    
-    /* 可选：添加代码行号样式 */
-    counter-reset: line;
 }
 
-/* 代码块滚动条样式 */
+/* 语法高亮颜色 - 修复选择器 */
+.code-block .comment { 
+    color: #6272a4 !important; 
+    font-style: italic;
+}
+
+.code-block .string { 
+    color: #f1fa8c !important; 
+}
+
+.code-block .keyword { 
+    color: #ff79c6 !important; 
+    font-weight: bold;
+}
+
+.code-block .function { 
+    color: #50fa7b !important; 
+}
+
+.code-block .number { 
+    color: #bd93f9 !important; 
+}
+
+.code-block .operator { 
+    color: #ff79c6 !important; 
+}
+
+.code-block .class-name {
+    color: #8be9fd !important;
+    font-weight: bold;
+}
+
+/* 代码块滚动条 */
 .code-block::-webkit-scrollbar {
     height: 8px;
 }
@@ -257,60 +251,7 @@ kbd {
     background: #d13453;
 }
 
-/* 代码语法高亮（基础） */
-.code-block .keyword { color: #ff79c6; }      /* 关键字 */
-.code-block .string { color: #f1fa8c; }       /* 字符串 */
-.code-block .comment { color: #6272a4; }      /* 注释 */
-.code-block .function { color: #50fa7b; }     /* 函数 */
-.code-block .number { color: #bd93f9; }       /* 数字 */
-.code-block .operator { color: #ff79c6; }     /* 操作符 */
-
-/* 可选：添加行号 */
-.code-block.with-line-numbers {
-    padding-left: 3.5em;
-    position: relative;
-}
-
-.code-block.with-line-numbers::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3em;
-    background: #0f3460;
-    border-right: 1px solid #1a1a2e;
-}
-
-/* 响应式代码块 */
-@media (max-width: 768px) {
-    .code-block {
-        font-size: 0.8rem;
-        padding: 12px;
-    }
-    
-    .code-block.with-line-numbers {
-        padding-left: 2.5em;
-    }
-    
-    .code-block.with-line-numbers::before {
-        width: 2em;
-    }
-}
-
-/* 代码块标题 */
-.code-block-title {
-    background: #0f3460;
-    color: #8b9bb4;
-    padding: 8px 15px;
-    margin: 0;
-    border-radius: 6px 6px 0 0;
-    font-size: 0.8rem;
-    font-weight: 600;
-    border-bottom: 1px solid #1a1a2e;
-}
-
-/* 代码复制按钮 */
+/* 代码块容器和复制按钮 */
 .code-block-container {
     position: relative;
 }
@@ -342,6 +283,35 @@ kbd {
     background: #10b981;
 }
 
+/* 加载指示器 */
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.loading.active {
+    display: flex;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #0f3460;
+    border-top: 4px solid #e94560;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -364,4 +334,78 @@ kbd {
         max-width: none;
         border-radius: 0;
     }
+    
+    .code-block {
+        font-size: 0.8rem;
+        padding: 12px;
+    }
+    
+    .controls-list {
+        gap: 10px;
+        -webkit-gap: 10px;
+        -moz-gap: 10px;
+    }
+}
+
+/* 场景信息分层样式 */
+.scene-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(22, 33, 62, 0.9);
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 300px;
+}
+
+.scene-info h3 {
+    color: #e94560;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #0f3460;
+    padding-bottom: 5px;
+}
+
+/* 场景自定义信息 */
+.scene-custom-stats {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #0f3460;
+}
+
+.scene-custom-stats .custom-info {
+    font-size: 0.8rem;
+    color: #8b9bb4;
+    line-height: 1.4;
+}
+
+/* 通用统计信息 */
+.scene-general-stats {
+    font-size: 0.8rem;
+    color: #8b9bb4;
+    line-height: 1.4;
+}
+
+/* 场景状态标签 */
+.scene-status {
+    display: inline-block;
+    background: #e94560;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    margin-left: 5px;
+}
+
+/* 自定义信息项 */
+.custom-item {
+    margin: 3px 0;
+}
+
+.custom-label {
+    color: #e94560;
+    font-weight: bold;
+}
+
+.custom-value {
+    color: #8b9bb4;
 }

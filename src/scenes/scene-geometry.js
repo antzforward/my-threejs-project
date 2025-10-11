@@ -33,6 +33,7 @@ export default function setup({ scene, camera, renderer, controls }) {
     let currentGeometry = null;
     let geometries = [];
     let wireframe = false;
+    let currentGeometryName = '未知';
     
     function init() {
         // 添加灯光
@@ -82,15 +83,38 @@ export default function setup({ scene, camera, renderer, controls }) {
         
         if (geometries[index]) {
             currentGeometry = geometries[index].mesh;
+            currentGeometryName = geometries[index].name;
             scene.add(currentGeometry);
-            
-            // 更新场景信息
-            const stats = document.getElementById('sceneStats');
-            if (stats) {
-                stats.innerHTML = `当前几何体: ${geometries[index].name}`;
-            }
+            updateCustomStats();
         }
     }
+    
+	// 自定义统计信息方法
+	function updateCustomStats() {
+		const vertexCount = currentGeometry ? 
+			currentGeometry.geometry.attributes.position.count : 0;
+		const customStatsElement = document.getElementById('sceneCustomStats');
+        
+        // 如果当前场景模块提供了自定义统计信息方法
+        if (customStatsElement) {
+            customStatsElement.innerHTML =  `
+				<div class="custom-info">
+					<div class="custom-item">
+						<span class="custom-label">当前几何体:</span> 
+						<span class="custom-value">${currentGeometryName}</span>
+					</div>
+					<div class="custom-item">
+						<span class="custom-label">顶点数量:</span> 
+						<span class="custom-value">${vertexCount}</span>
+					</div>
+					<div class="custom-item">
+						<span class="custom-label">线框模式:</span> 
+						<span class="custom-value">${wireframe ? '开启' : '关闭'}</span>
+					</div>
+				</div>
+			`;
+        }
+	}
     
     function handleKeyPress(event) {
         switch(event.key) {
@@ -103,6 +127,7 @@ export default function setup({ scene, camera, renderer, controls }) {
                 geometries.forEach(geo => {
                     geo.mesh.material.wireframe = wireframe;
                 });
+                updateCustomStats();
                 break;
         }
     }
@@ -124,7 +149,11 @@ export default function setup({ scene, camera, renderer, controls }) {
             geo.mesh.geometry.dispose();
             geo.mesh.material.dispose();
         });
-        
+        // 清理掉
+        const customStatsElement = document.getElementById('sceneCustomStats');
+        if (customStatsElement) {
+            customStatsElement.innerHTML =  `<div class="custom-info"></div>`;
+        }
         document.removeEventListener('keydown', handleKeyPress);
     }
     

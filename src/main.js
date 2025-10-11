@@ -50,7 +50,7 @@ class ThreeJSPlatform {
     async loadSceneList() {
 		try {
 			// 动态获取 scenes 目录下的所有文件
-			const scenesContext = import.meta.glob('./scenes/*.js');
+			const scenesContext = import.meta.glob('./scenes/scene-*.js');
 			
 			for (const path in scenesContext) {
 				const module = await scenesContext[path]();
@@ -139,6 +139,55 @@ class ThreeJSPlatform {
             console.error('场景加载错误:', error);
         }
     }
+    updateSceneInfo(sceneInfo) {
+        // 更新场景名称
+        document.getElementById('currentSceneName').textContent = sceneInfo.name;
+        
+        // 更新场景统计信息
+        this.updateSceneStats();
+        
+        // 更新描述内容
+        this.updateDescription(sceneInfo);
+    }
+    
+    updateSceneStats() {
+        // 获取通用统计信息
+        const meshCount = this.scene.children.filter(child => child.isMesh).length;
+        const lightCount = this.scene.children.filter(child => child.isLight).length;
+        const lineCount = this.scene.children.filter(child => child.isLine).length;
+        const cameraInfo = `X:${this.camera.position.x.toFixed(1)} Y:${this.camera.position.y.toFixed(1)} Z:${this.camera.position.z.toFixed(1)}`;
+        
+        // 更新通用统计信息
+        const generalStatsElement = document.getElementById('sceneGeneralStats');
+        if (generalStatsElement) {
+            generalStatsElement.innerHTML = `
+                网格: ${meshCount}<br>
+                光源: ${lightCount}<br>
+                线条: ${lineCount}<br>
+                相机: ${cameraInfo}
+            `;
+        }
+        
+        // 获取并更新场景自定义信息
+        //this.updateCustomStats();//自己被动更新即可
+    }
+    
+    updateCustomStats() {
+        const customStatsElement = document.getElementById('sceneCustomStats');
+        
+        // 如果当前场景模块提供了自定义统计信息方法
+        if (this.currentSceneModule && this.currentSceneModule.getCustomStats) {
+            const customStats = this.currentSceneModule.getCustomStats();
+            if (customStatsElement) {
+                customStatsElement.innerHTML = customStats;
+            }
+        } else {
+            // 如果没有自定义信息，显示默认提示或隐藏
+            if (customStatsElement) {
+                customStatsElement.innerHTML = '<div class="custom-info">场景运行中...</div>';
+            }
+        }
+    }
     
     updateDescription(sceneInfo) {
         const description = document.getElementById('descriptionContent');
@@ -156,24 +205,6 @@ class ThreeJSPlatform {
                     `).join('')}
                 </div>
             `;
-        } else {
-            controlsHTML = `
-                <h4>交互控制</h4>
-                <div class="controls-list">
-                    <div class="control-item">
-                        <kbd>鼠标左键拖动</kbd>
-                        <span>旋转视角</span>
-                    </div>
-                    <div class="control-item">
-                        <kbd>鼠标右键拖动</kbd>
-                        <span>平移场景</span>
-                    </div>
-                    <div class="control-item">
-                        <kbd>鼠标滚轮</kbd>
-                        <span>缩放</span>
-                    </div>
-                </div>
-            `;
         }
         
         let notesHTML = '';
@@ -186,8 +217,8 @@ class ThreeJSPlatform {
             `;
         }
         
-        // 格式化代码
-        const formattedCode = this.formatCode(sceneInfo.codeExample || '// 代码示例');
+        // 简单的代码格式化
+        const formattedCode = this.simpleFormatCode(sceneInfo.codeExample || '// 代码示例');
         
         description.innerHTML = `
             <h4>场景描述</h4>
@@ -195,63 +226,31 @@ class ThreeJSPlatform {
             
             <h4>技术要点</h4>
             <div class="code-block-container">
-                <div class="code-block" id="codeBlock">${formattedCode}</div>
-                <button class="copy-button" onclick="copyCode()">复制代码</button>
+                <div class="code-block">${formattedCode}</div>
+                <button class="copy-button">复制代码</button>
             </div>
             
             ${controlsHTML}
             ${notesHTML}
         `;
         
-        // 重新绑定复制按钮事件
-        this.setupCopyButton();
+        // 设置复制按钮
+        this.setupCopyButton(sceneInfo.codeExample || '// 代码示例');
     }
     
-	// 简单的语法高亮
-    highlightCode(code) {
+    simpleFormatCode(code) {
+        // 只做最基本的格式化：处理换行和缩进
         return code
-            // 注释
-            .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
-            // 字符串
-            .replace(/('.*?'|".*?")/g, '<span class="string">$1</span>')
-            // 关键字
-            .replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|from|default)\b/g, '<span class="keyword">$1</span>')
-            // 数字
-            .replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>')
-            // 函数调用
-            .replace(/(\w+)(?=\s*\()/g, '<span class="function">$1</span>')
-            // 操作符
-            .replace(/(=|\+|-|\*|\/|%|&|\||\^|~|!|<|>)/g, '<span class="operator">$1</span>');
-    }
-    
-    // 更新 formatCode 方法以包含高亮
-    formatCode(code) {
-        let formatted = code
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;')
             .replace(/\n/g, '<br>')
             .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
-            .replace(/ /g, '&nbsp;');
-        
-        // 应用语法高亮
-        formatted = this.highlightCode(formatted);
-        
-        return formatted;
+            .replace(/  /g, ' &nbsp;');
     }
     
-    // 设置复制按钮功能
-    setupCopyButton() {
+    setupCopyButton(code) {
         const copyButton = document.querySelector('.copy-button');
         if (copyButton) {
             copyButton.onclick = () => {
-                const codeBlock = document.getElementById('codeBlock');
-                const codeText = codeBlock.textContent || codeBlock.innerText;
-                
-                navigator.clipboard.writeText(codeText).then(() => {
-                    // 显示复制成功反馈
+                navigator.clipboard.writeText(code).then(() => {
                     copyButton.textContent = '已复制!';
                     copyButton.classList.add('copied');
                     
@@ -271,28 +270,6 @@ class ThreeJSPlatform {
         }
     }
     
-    updateSceneInfo(sceneInfo) {
-        document.getElementById('currentSceneName').textContent = sceneInfo.name;
-        
-        const description = document.getElementById('descriptionContent');
-        description.innerHTML = `
-            <h4>场景描述</h4>
-            <p>${sceneInfo.longDescription}</p>
-            
-            <h4>技术要点</h4>
-            <div class="code-block">${sceneInfo.codeExample}</div>
-            
-            <h4>交互控制</h4>
-            <div class="controls-list">
-                ${sceneInfo.controls.map(control => `
-                    <div class="control-item">
-                        <kbd>${control.key}</kbd>
-                        <span>${control.action}</span>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    }
     
     onWindowResize() {
         const container = document.getElementById('threejs-container');
@@ -307,7 +284,6 @@ class ThreeJSPlatform {
         if (this.currentSceneModule && this.currentSceneModule.update) {
             this.currentSceneModule.update();
         }
-        
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }

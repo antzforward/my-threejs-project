@@ -81,11 +81,6 @@ export default function setup({ scene, camera, renderer, controls }) {
         
         // 添加键盘监听
         document.addEventListener('keydown', handleKeyPress);
-        // 更新场景信息
-		const stats = document.getElementById('sceneStats');
-		if (stats) {
-			stats.innerHTML = `${sceneInfo.name}`;
-		}
     }
     
     // 更新函数 - 每帧调用
@@ -118,11 +113,7 @@ export default function setup({ scene, camera, renderer, controls }) {
     function onKeyDown(event) {
         handleKeyPress(event);
     }
-    
-    function onKeyUp(event) {
-        // 键盘释放处理
-    }
-    
+     
     // 清理函数 - 切换场景时调用
     function destroy() {
         // 清理自定义资源
@@ -145,7 +136,6 @@ export default function setup({ scene, camera, renderer, controls }) {
     return {
         update,
         onKeyDown,
-        onKeyUp,
         destroy
     };
 }
